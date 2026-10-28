@@ -103,108 +103,154 @@ def fetch_contributions():
     }
 
 
-THEMES = {
-    "dark": {"bg": "#0d1117", "fg": "#e6edf3", "muted": "#8b949e", "track": "#21262d", "border": "#30363d"},
-    "light": {"bg": "#ffffff", "fg": "#1f2328", "muted": "#59636e", "track": "#eaeef2", "border": "#d0d7de"},
-}
-FONT = "font-family:'Segoe UI',Ubuntu,'Helvetica Neue',sans-serif"
+
+STACK = [
+    ("backend", "c# · .net · java · spring"),
+    ("frontend", "typescript · react · javascript"),
+    ("mobile", "kotlin · android tv"),
+    ("data", "postgresql · mssql · python"),
+]
+
+W, PAD, LH, FS = 700, 26, 21, 14
+CW = FS * 0.61  # monospace char width estimate
+BG, RED = "#0a0a0a", "#e0262b"
+PROMPT = "root@mrtsknn:~#"
 
 
-def frame(t, w, h, title, body):
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
+class Term:
+    def __init__(self):
+        self.rows, self.t = [], 0.4
+
+    def cmd(self, text):
+        dur = max(0.4, len(text) * 0.045)
+        self.rows.append(("cmd", text, self.t, dur))
+        self.t += dur + 0.35
+
+    def out(self, parts, step=0.07):
+        self.rows.append(("out", parts, self.t, 0))
+        self.t += step
+
+    def bar(self, name, pct):
+        self.rows.append(("bar", (name, pct), self.t, 0))
+        self.t += 0.09
+
+    def gap(self):
+        self.rows.append(("gap", None, self.t, 0))
+
+    def render(self):
+        top = 44
+        h = top + 4 + LH * (len(self.rows) + 1) + 18
+        body, y = [], top + 4
+        for kind, data, t, dur in self.rows:
+            y += LH
+            if kind == "gap":
+                continue
+            show = f'style="animation-delay:{t:.2f}s"'
+            if kind == "cmd":
+                px = PAD + (len(PROMPT) + 1) * CW
+                n = len(data)
+                body.append(
+                    f'<g class="show" {show}><text x="{PAD}" y="{y}"><tspan class="p">{PROMPT}</tspan> '
+                    f'<tspan class="c">{escape(data)}</tspan></text>'
+                    f'<rect class="type" x="{px:.1f}" y="{y - FS}" width="{n * CW + 12:.1f}" height="{LH}" fill="{BG}" '
+                    f'style="--d:{n * CW + 12:.1f}px;animation:type {dur:.2f}s steps({n}) {t:.2f}s forwards"/></g>'
+                )
+            elif kind == "out":
+                spans = "".join(f'<tspan class="{c}">{escape(s)}</tspan>' for c, s in data)
+                body.append(f'<text class="show" {show} x="{PAD}" y="{y}" xml:space="preserve">{spans}</text>')
+            elif kind == "bar":
+                name, pct = data
+                cells, filled = 32, round(pct / 100 * 32 * 2) / 2
+                bx = PAD + 14 * CW
+                rects = []
+                for i in range(cells):
+                    fill = RED if i + 1 <= filled else ("#7a1416" if i < filled else "#1c1c1c")
+                    rects.append(f'<rect x="{bx + i * 11:.1f}" y="{y - 11}" width="8" height="11" fill="{fill}"/>')
+                body.append(
+                    f'<g class="show" {show}><text x="{PAD}" y="{y}" class="o">{escape(name)}</text>{"".join(rects)}'
+                    f'<text x="{bx + cells * 11 + 14:.1f}" y="{y}" class="h">{pct:5.1f}%</text></g>'
+                )
+        cy = y + LH
+        body.append(
+            f'<g class="show" style="animation-delay:{self.t:.2f}s"><text x="{PAD}" y="{cy}" class="p">{PROMPT}</text>'
+            f'<rect class="blink" x="{PAD + (len(PROMPT) + 1) * CW:.1f}" y="{cy - FS + 2}" width="{CW:.1f}" height="{FS + 2}" fill="#d8d8d8"/></g>'
+        )
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{h}" viewBox="0 0 {W} {h}">
 <defs>
-  <clipPath id="bar"><rect x="25" y="0" width="{w - 50}" height="{h}" rx="5"/></clipPath>
+  <pattern id="scan" width="4" height="3" patternUnits="userSpaceOnUse"><rect width="4" height="1" fill="#ffffff" opacity="0.035"/></pattern>
+  <radialGradient id="vignette" cx="50%" cy="45%" r="75%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.55"/></radialGradient>
 </defs>
 <style>
-  text {{ {FONT}; }}
-  .title {{ font-size:14px; font-weight:600; fill:{t['fg']}; }}
-  .label {{ font-size:12.5px; fill:{t['muted']}; }}
-  .value {{ font-size:18px; font-weight:600; fill:{t['fg']}; }}
-  .lang {{ font-size:12.5px; fill:{t['fg']}; }}
-  .pct {{ font-size:12px; fill:{t['muted']}; }}
-  .fade {{ opacity:0; animation: fade .6s ease-out forwards; }}
-  .grow {{ transform-box: fill-box; transform-origin: left; transform: scaleX(0); animation: grow 1s cubic-bezier(.2,.8,.2,1) forwards; }}
-  @keyframes fade {{ to {{ opacity:1; }} }}
-  @keyframes grow {{ to {{ transform: scaleX(1); }} }}
+  text {{ font-family: 'JetBrains Mono','Fira Code','SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; font-size:{FS}px; fill:#bdbdbd; }}
+  .p {{ fill:{RED}; font-weight:700; }}
+  .c {{ fill:#f2f2f2; }}
+  .o {{ fill:#9a9a9a; }}
+  .d {{ fill:#5a5a5a; }}
+  .h {{ fill:#f2f2f2; font-weight:700; }}
+  .r {{ fill:{RED}; font-weight:700; }}
+  .tt {{ font-size:12px; fill:#6a6a6a; }}
+  .show {{ opacity:0; animation: show 0s linear forwards; }}
+  .type {{ animation-fill-mode: forwards; }}
+  .blink {{ animation: blink 1s steps(1) infinite; }}
+  @keyframes show {{ to {{ opacity:1; }} }}
+  @keyframes type {{ to {{ transform: translateX(var(--d)); }} }}
+  @keyframes blink {{ 50% {{ opacity:0; }} }}
 </style>
-<rect x="0.5" y="0.5" width="{w - 1}" height="{h - 1}" rx="12" fill="{t['bg']}" stroke="{t['border']}"/>
-<text x="25" y="36" class="title">{escape(title)}</text>
-{body}
+<rect width="{W}" height="{h}" rx="10" fill="{BG}"/>
+<rect x="0.5" y="0.5" width="{W - 1}" height="{h - 1}" rx="10" fill="none" stroke="#262626"/>
+<path d="M0.5 34 V10.5 a10 10 0 0 1 10 -10 H{W - 10.5} a10 10 0 0 1 10 10 V34 Z" fill="#121212"/>
+<line x1="0" y1="34" x2="{W}" y2="34" stroke="#262626"/>
+<circle cx="20" cy="17" r="5.5" fill="#3a3a3a"/><circle cx="38" cy="17" r="5.5" fill="#3a3a3a"/><circle cx="56" cy="17" r="5.5" fill="{RED}" opacity="0.85"/>
+<text x="{W / 2}" y="21.5" text-anchor="middle" class="tt">root@mrtsknn: ~ — ssh 10.0.0.1</text>
+{chr(10).join(body)}
+<rect y="34" width="{W}" height="{h - 34}" fill="url(#scan)" pointer-events="none"/>
+<rect width="{W}" height="{h}" rx="10" fill="url(#vignette)" pointer-events="none"/>
 </svg>
 """
 
 
-def stats_svg(t, s, stars, repo_count):
-    items = [
-        ("Toplam katkı", f"{s['total']:,}"),
-        ("Son 1 yıl", f"{s['last_year']:,}"),
-        ("Commit", f"{s['commits']:,}"),
-        ("Güncel seri", f"{s['current_streak']} gün"),
-        ("En uzun seri", f"{s['longest_streak']} gün"),
-        ("Repo · Yıldız", f"{repo_count} · {stars}"),
+def terminal_svg(s, langs, repo_count):
+    term = Term()
+    term.cmd("whoami")
+    term.out([("h", "murat"), ("d", "  // full stack developer @ vakifbank · istanbul")])
+    term.out([("o", "hello, friend.")])
+    term.gap()
+    term.cmd("cat /etc/stack")
+    for k, v in STACK:
+        term.out([("r", f"{k:<10}"), ("o", v)])
+    term.gap()
+    term.cmd("./recon --target=self --include-private")
+    term.out([("d", f"[*] scanning {repo_count} repositories ... "), ("h", "done")], step=0.35)
+    rows = [
+        ("contributions", f"{s['total']:,}"),
+        ("last 365 days", f"{s['last_year']:,}"),
+        ("commits", f"{s['commits']:,}"),
+        ("streak", f"{s['current_streak']}d  (max {s['longest_streak']}d)"),
     ]
-    cells = []
-    for i, (label, value) in enumerate(items):
-        x = 25 + (i % 3) * 135
-        y = 78 + (i // 3) * 62
-        cells.append(
-            f'<g class="fade" style="animation-delay:{i * 90}ms">'
-            f'<text x="{x}" y="{y}" class="value">{escape(value)}</text>'
-            f'<text x="{x}" y="{y + 20}" class="label">{escape(label)}</text></g>'
-        )
-    return frame(t, 440, 200, "Özet", "\n".join(cells))
-
-
-def langs_svg(t, langs):
-    total = sum(size for size, _ in langs.values()) or 1
-    top = sorted(langs.items(), key=lambda kv: kv[1][0], reverse=True)[:TOP_N]
-    other = total - sum(v[0] for _, v in top)
-    rows = [(name, size, color) for name, (size, color) in top]
-    if other > 0:
-        rows.append(("Diğer", other, "#6e7681"))
-
-    w, bar_w = 440, 390
-    x, segs = 25.0, []
-    for i, (_, size, color) in enumerate(rows):
-        seg = size / total * bar_w
-        segs.append(f'<rect class="grow" style="animation-delay:{i * 60}ms" x="{x:.2f}" y="56" width="{seg:.2f}" height="8" fill="{color}"/>')
-        x += seg
-    bar = f'<rect x="25" y="56" width="{bar_w}" height="8" rx="4" fill="{t["track"]}"/><g clip-path="url(#bar)">{"".join(segs)}</g>'
-
-    items = []
-    half = (len(rows) + 1) // 2
-    for i, (name, size, color) in enumerate(rows):
-        cx = 25 + (i // half) * 200
-        cy = 94 + (i % half) * 24
-        items.append(
-            f'<g class="fade" style="animation-delay:{300 + i * 70}ms">'
-            f'<circle cx="{cx + 5}" cy="{cy - 4}" r="5" fill="{color}"/>'
-            f'<text x="{cx + 17}" y="{cy}" class="lang">{escape(name)}</text>'
-            f'<text x="{cx + 185}" y="{cy}" class="pct" text-anchor="end">{size / total * 100:.1f}%</text></g>'
-        )
-    h = 94 + half * 24
-    return frame(t, w, h, "Diller", bar + "\n" + "\n".join(items))
+    for k, v in rows:
+        term.out([("r", "[+] "), ("o", f"{k:<16}"), ("h", v)])
+    term.out([("r", "[!] "), ("o", f"{'private repos':<16}"), ("d", "counted · names "), ("r", "[REDACTED]")])
+    term.gap()
+    term.cmd(f"./langs --top {TOP_N}")
+    total = sum(langs.values()) or 1
+    for name, size in sorted(langs.items(), key=lambda kv: kv[1], reverse=True)[:TOP_N]:
+        term.bar(name.lower(), size / total * 100)
+    return term.render()
 
 
 def main():
     repos, repo_count = fetch_repos()
-    langs, stars = {}, 0
+    langs = {}
     for r in repos:
-        stars += r["stargazerCount"]
         for e in r["languages"]["edges"]:
             name = e["node"]["name"]
-            if name.lower() in EXCLUDE:
-                continue
-            size, color = langs.get(name, (0, e["node"]["color"] or "#8b949e"))
-            langs[name] = (size + e["size"], color)
+            if name.lower() not in EXCLUDE:
+                langs[name] = langs.get(name, 0) + e["size"]
     s = fetch_contributions()
 
     os.makedirs(OUT_DIR, exist_ok=True)
-    for mode, t in THEMES.items():
-        with open(os.path.join(OUT_DIR, f"stats-{mode}.svg"), "w", encoding="utf-8") as f:
-            f.write(stats_svg(t, s, stars, repo_count))
-        with open(os.path.join(OUT_DIR, f"langs-{mode}.svg"), "w", encoding="utf-8") as f:
-            f.write(langs_svg(t, langs))
+    with open(os.path.join(OUT_DIR, "terminal.svg"), "w", encoding="utf-8") as f:
+        f.write(terminal_svg(s, langs, repo_count))
     print(f"ok: {len(langs)} languages, {repo_count} repos, generated {dt.date.today()}")
 
 

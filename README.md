@@ -1,18 +1,15 @@
-### Murat
+<div align="center">
 
-Vakıfbank'ta full stack developer. Backend'de C# / .NET, frontend'de TypeScript, Android ve TV tarafında Kotlin.
+<img src="assets/terminal.svg" alt="root@mrtsknn" width="700" />
 
-[LinkedIn](https://linkedin.com/in/bunyamintaskin) · [Instagram](https://instagram.com/mrtsknn) · [E-posta](mailto:mrtskn@icloud.com)
+<br/><br/>
+
+<code>[ <a href="https://linkedin.com/in/bunyamintaskin">linkedin</a> ]</code>&nbsp;
+<code>[ <a href="https://instagram.com/mrtsknn">instagram</a> ]</code>&nbsp;
+<code>[ <a href="mailto:mrtskn@icloud.com">mail</a> ]</code>
 
 <br/>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/stats-dark.svg" />
-  <img src="assets/stats-light.svg" alt="GitHub istatistikleri" height="190" />
-</picture>
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/langs-dark.svg" />
-  <img src="assets/langs-light.svg" alt="Diller" height="190" />
-</picture>
+<sub><code>// stats include private repos · names are never exposed · refreshed daily</code></sub>
 
-<sub>Özel repolar dahil, her gün güncellenir.</sub>
+</div>
