@@ -113,16 +113,13 @@ FONT = "font-family:'Segoe UI',Ubuntu,'Helvetica Neue',sans-serif"
 def frame(t, w, h, title, body):
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
 <defs>
-  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#2563eb"/><stop offset="1" stop-color="#06b6d4"/>
-  </linearGradient>
   <clipPath id="bar"><rect x="25" y="0" width="{w - 50}" height="{h}" rx="5"/></clipPath>
 </defs>
 <style>
   text {{ {FONT}; }}
-  .title {{ font-size:17px; font-weight:700; fill:url(#accent); }}
+  .title {{ font-size:14px; font-weight:600; fill:{t['fg']}; }}
   .label {{ font-size:12.5px; fill:{t['muted']}; }}
-  .value {{ font-size:20px; font-weight:700; fill:{t['fg']}; }}
+  .value {{ font-size:18px; font-weight:600; fill:{t['fg']}; }}
   .lang {{ font-size:12.5px; fill:{t['fg']}; }}
   .pct {{ font-size:12px; fill:{t['muted']}; }}
   .fade {{ opacity:0; animation: fade .6s ease-out forwards; }}
@@ -131,8 +128,7 @@ def frame(t, w, h, title, body):
   @keyframes grow {{ to {{ transform: scaleX(1); }} }}
 </style>
 <rect x="0.5" y="0.5" width="{w - 1}" height="{h - 1}" rx="12" fill="{t['bg']}" stroke="{t['border']}"/>
-<rect x="0.5" y="0.5" width="{w - 1}" height="3" rx="1.5" fill="url(#accent)"/>
-<text x="25" y="38" class="title">{escape(title)}</text>
+<text x="25" y="36" class="title">{escape(title)}</text>
 {body}
 </svg>
 """
@@ -156,7 +152,7 @@ def stats_svg(t, s, stars, repo_count):
             f'<text x="{x}" y="{y}" class="value">{escape(value)}</text>'
             f'<text x="{x}" y="{y + 20}" class="label">{escape(label)}</text></g>'
         )
-    return frame(t, 440, 200, "GitHub Özeti", "\n".join(cells))
+    return frame(t, 440, 200, "Özet", "\n".join(cells))
 
 
 def langs_svg(t, langs):
@@ -171,9 +167,9 @@ def langs_svg(t, langs):
     x, segs = 25.0, []
     for i, (_, size, color) in enumerate(rows):
         seg = size / total * bar_w
-        segs.append(f'<rect class="grow" style="animation-delay:{i * 60}ms" x="{x:.2f}" y="56" width="{seg:.2f}" height="10" fill="{color}"/>')
+        segs.append(f'<rect class="grow" style="animation-delay:{i * 60}ms" x="{x:.2f}" y="56" width="{seg:.2f}" height="8" fill="{color}"/>')
         x += seg
-    bar = f'<rect x="25" y="56" width="{bar_w}" height="10" rx="5" fill="{t["track"]}"/><g clip-path="url(#bar)">{"".join(segs)}</g>'
+    bar = f'<rect x="25" y="56" width="{bar_w}" height="8" rx="4" fill="{t["track"]}"/><g clip-path="url(#bar)">{"".join(segs)}</g>'
 
     items = []
     half = (len(rows) + 1) // 2
@@ -187,7 +183,7 @@ def langs_svg(t, langs):
             f'<text x="{cx + 185}" y="{cy}" class="pct" text-anchor="end">{size / total * 100:.1f}%</text></g>'
         )
     h = 94 + half * 24
-    return frame(t, w, h, "En Çok Kullandığım Diller", bar + "\n" + "\n".join(items))
+    return frame(t, w, h, "Diller", bar + "\n" + "\n".join(items))
 
 
 def main():

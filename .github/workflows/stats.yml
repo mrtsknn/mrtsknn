@@ -30,14 +30,6 @@ jobs:
           if [ -z "$GH_TOKEN" ]; then echo "::warning::STATS_TOKEN secret missing, cards not refreshed"; exit 0; fi
           python scripts/generate_stats.py
 
-      - name: Generate contribution snake
-        uses: Platane/snk/svg-only@v3
-        with:
-          github_user_name: ${{ github.repository_owner }}
-          outputs: |
-            assets/snake-dark.svg?palette=github-dark&color_snake=#7c3aed&color_dots=#161b22,#0e4429,#006d32,#26a641,#39d353
-            assets/snake-light.svg?color_snake=#7c3aed
-
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"

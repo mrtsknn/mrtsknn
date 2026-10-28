@@ -1,15 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="440" height="214" viewBox="0 0 440 214">
 <defs>
-  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#2563eb"/><stop offset="1" stop-color="#06b6d4"/>
-  </linearGradient>
   <clipPath id="bar"><rect x="25" y="0" width="390" height="214" rx="5"/></clipPath>
 </defs>
 <style>
   text { font-family:'Segoe UI',Ubuntu,'Helvetica Neue',sans-serif; }
-  .title { font-size:17px; font-weight:700; fill:url(#accent); }
+  .title { font-size:14px; font-weight:600; fill:#e6edf3; }
   .label { font-size:12.5px; fill:#8b949e; }
-  .value { font-size:20px; font-weight:700; fill:#e6edf3; }
+  .value { font-size:18px; font-weight:600; fill:#e6edf3; }
   .lang { font-size:12.5px; fill:#e6edf3; }
   .pct { font-size:12px; fill:#8b949e; }
   .fade { opacity:0; animation: fade .6s ease-out forwards; }
@@ -18,9 +15,8 @@
   @keyframes grow { to { transform: scaleX(1); } }
 </style>
 <rect x="0.5" y="0.5" width="439" height="213" rx="12" fill="#0d1117" stroke="#30363d"/>
-<rect x="0.5" y="0.5" width="439" height="3" rx="1.5" fill="url(#accent)"/>
-<text x="25" y="38" class="title">En Çok Kullandığım Diller</text>
-<rect x="25" y="56" width="390" height="10" rx="5" fill="#21262d"/><g clip-path="url(#bar)"><rect class="grow" style="animation-delay:0ms" x="25.00" y="56" width="176.68" height="10" fill="#7355dd"/><rect class="grow" style="animation-delay:60ms" x="201.68" y="56" width="172.06" height="10" fill="#3178c6"/><rect class="grow" style="animation-delay:120ms" x="373.74" y="56" width="14.20" height="10" fill="#f1e05a"/><rect class="grow" style="animation-delay:180ms" x="387.95" y="56" width="13.67" height="10" fill="#3572A5"/><rect class="grow" style="animation-delay:240ms" x="401.62" y="56" width="4.80" height="10" fill="#A97BFF"/><rect class="grow" style="animation-delay:300ms" x="406.41" y="56" width="3.69" height="10" fill="#663399"/><rect class="grow" style="animation-delay:360ms" x="410.10" y="56" width="1.98" height="10" fill="#F05138"/><rect class="grow" style="animation-delay:420ms" x="412.08" y="56" width="1.06" height="10" fill="#e34c26"/><rect class="grow" style="animation-delay:480ms" x="413.14" y="56" width="1.86" height="10" fill="#6e7681"/></g>
+<text x="25" y="36" class="title">Diller</text>
+<rect x="25" y="56" width="390" height="8" rx="4" fill="#21262d"/><g clip-path="url(#bar)"><rect class="grow" style="animation-delay:0ms" x="25.00" y="56" width="176.63" height="8" fill="#7355dd"/><rect class="grow" style="animation-delay:60ms" x="201.63" y="56" width="172.01" height="8" fill="#3178c6"/><rect class="grow" style="animation-delay:120ms" x="373.64" y="56" width="14.20" height="8" fill="#f1e05a"/><rect class="grow" style="animation-delay:180ms" x="387.84" y="56" width="13.78" height="8" fill="#3572A5"/><rect class="grow" style="animation-delay:240ms" x="401.62" y="56" width="4.79" height="8" fill="#A97BFF"/><rect class="grow" style="animation-delay:300ms" x="406.42" y="56" width="3.69" height="8" fill="#663399"/><rect class="grow" style="animation-delay:360ms" x="410.11" y="56" width="1.98" height="8" fill="#F05138"/><rect class="grow" style="animation-delay:420ms" x="412.08" y="56" width="1.06" height="8" fill="#e34c26"/><rect class="grow" style="animation-delay:480ms" x="413.14" y="56" width="1.86" height="8" fill="#6e7681"/></g>
 <g class="fade" style="animation-delay:300ms"><circle cx="30" cy="90" r="5" fill="#7355dd"/><text x="42" y="94" class="lang">C#</text><text x="210" y="94" class="pct" text-anchor="end">45.3%</text></g>
 <g class="fade" style="animation-delay:370ms"><circle cx="30" cy="114" r="5" fill="#3178c6"/><text x="42" y="118" class="lang">TypeScript</text><text x="210" y="118" class="pct" text-anchor="end">44.1%</text></g>
 <g class="fade" style="animation-delay:440ms"><circle cx="30" cy="138" r="5" fill="#f1e05a"/><text x="42" y="142" class="lang">JavaScript</text><text x="210" y="142" class="pct" text-anchor="end">3.6%</text></g>
